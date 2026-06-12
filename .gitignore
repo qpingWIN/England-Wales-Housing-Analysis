@@ -1,0 +1,18 @@
+# Ignore data files
+data/raw/
+
+# Private working notes
+PROJECT_SPEC.md
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# Jupyter checkpoints
+.ipynb_checkpoints/
