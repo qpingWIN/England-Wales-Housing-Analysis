@@ -22,12 +22,6 @@ DATA_DIR   = os.path.join(os.path.dirname(__file__), '..', 'data', 'raw')
 ONSPD_FILE = os.path.join(DATA_DIR, 'ONSPD_MAY_2026_UK.csv')
 
 # ── DB connection ──
-# Credentials come from environment variables, NOT hardcoded.
-# Set them in your shell (or a .env file loaded by python-dotenv):
-#   export PGPASSWORD='your_password'
-# Defaults are provided for the non-secret fields so local runs are frictionless,
-# but the password has NO default — the script fails loudly if it's missing,
-# which is what you want (better than a silent wrong-password hang).
 DB = dict(
     host     = os.environ.get('PGHOST', 'localhost'),
     dbname   = os.environ.get('PGDATABASE', 'ew_housing'),
@@ -51,7 +45,7 @@ REGION_NAMES = {
 }
 
 # ── Load ──
-print("Reading ONSPD file …")
+print("Reading ONSPD file ...")
 df = pd.read_csv(
     ONSPD_FILE,
     usecols=['pcds', 'lad25cd', 'rgn25cd', 'ctry25cd', 'lat', 'long'],
