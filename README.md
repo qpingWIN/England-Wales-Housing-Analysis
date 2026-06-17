@@ -14,10 +14,10 @@ Python (profiling + ETL) -> PostgreSQL (star schema warehouse) -> SQL (16 analyt
 
 ```
 pp-complete.csv ─┐
-                 ├─► Python: profile + clean ─► COPY into Postgres (staging)
+                 -> Python: profile + clean -> COPY into Postgres (staging)
 ONSPD ───────────┘                                      │
                                                         ▼
-                                          Transform → star schema
+                                          Transform -> star schema
                                           (dim_date, dim_geography,
                                            dim_property_type, fact_sales)
                                                         │
@@ -37,6 +37,7 @@ The database does the heavy lifting, Tableau and Excel only ever see aggregates,
 |---|---|---|
 | [HM Land Registry Price Paid Data](https://www.gov.uk/government/statistical-data-sets/price-paid-data-downloads) (`pp-complete.csv`, ~6 GB) | Every standard residential sale in E&W since 1995 | No — download separately |
 | [ONS Postcode Directory (ONSPD)](https://geoportal.statistics.gov.uk/) | Postcode → local authority, region, lat/long | No — download separately |
+| [ONS Local Authority Districts (April 2025) Names and Codes in the UK (V2)](https://geoportal.statistics.gov.uk/datasets/ons::local-authority-districts-april-2025-names-and-codes-in-the-uk-v2/about) (`LAD25_names_and_codes.csv`) | LAD code → human-readable name lookup (`dim_geography.lad_name`, backfilled by `scripts/04_backfill_lad_names.py`) | No — download separately |
 | ONS ASHE median earnings by local authority | Affordability model (price-to-income) | No |
 | ONS CPIH index | Deflating nominal prices to real terms | No |
 
@@ -51,6 +52,7 @@ Contains HM Land Registry data © Crown copyright and database right 2026. Licen
 - **Category A only.** Analysis filters to standard sales (Category A, ~29.5M rows). Category B (repossessions, portfolio/company transfers, ~1.8M rows) is excluded and noted.
 - **Coverage.** Excludes gifts, transfers not for value, some right-to-buy, and commercial property. This is "standard residential sales registered with HMLR," not "all property".
 - **Missing postcodes.** 14,203 rows (0.05%) can't be geocoded: kept in national aggregates, excluded from maps.
+- **New-build registration lag.** HMLR registers a sale once it's lodged, an ordinary resale clears in 2 weeks–2 months, but a new-build sale needs a *first registration* of a brand-new title, which HMLR's currently published processing times put at up to 12 months. That shows up directly in query #3: new-build share of sales falls from 9.3% (2024) to 4.3% (2025) to 0.1% (2026), which is far too sharp to be a real housebuilding slowdown, and not just a partial-year artifact, since 2025 is a complete calendar year. Treat new-build figures from ~2024 onward as increasingly provisional.
 
 ## Repository structure
 
@@ -70,8 +72,8 @@ Contains HM Land Registry data © Crown copyright and database right 2026. Licen
 | Phase | Work | Status |
 |---|---|---|
 | 0 | Profile data, decide filters (Cat A, price ≥ £10k, exclude partial 2026) | ✅ Done — see `notebooks/` |
-| 1 | Clean + COPY-load into Postgres star schema, ONSPD geography merge | 🔜 In progress |
-| 2 | 16 analytical SQL queries | Planned |
+| 1 | Clean + COPY-load into Postgres star schema, ONSPD geography merge | ✅ Done |
+| 2 | 16 analytical SQL queries | 🔜 In progress |
 | 3 | Tableau Public dashboard | Planned |
 | 4 | Excel affordability model | Planned |
 | 5 | Findings, screenshots, polish | Planned |
