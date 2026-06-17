@@ -177,7 +177,7 @@ conn.commit()
 cur.execute("SELECT COUNT(*) FROM fact_sales;")
 print(f"  fact_sales rows: {cur.fetchone()[0]:,}")
 
-# Rebuild indexes now that the table is fully loaded, same definitions as sql/01_schema_ddl.sql.
+# Rebuild indexes now that the table is fully loaded, same definitions as sql/00_schema_ddl.sql.
 print("  Rebuilding indexes on fact_sales ...")
 cur.execute("CREATE INDEX idx_fact_date ON fact_sales(date_key);")
 cur.execute("CREATE INDEX idx_fact_geo  ON fact_sales(geo_key);")

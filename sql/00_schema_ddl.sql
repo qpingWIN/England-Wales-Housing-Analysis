@@ -52,6 +52,13 @@ CREATE TABLE dim_geography (
     postcode        TEXT         NOT NULL UNIQUE,
     outcode         TEXT         NOT NULL,   -- e.g. 'SW1A' from 'SW1A 2AA'
     lad_code        TEXT,                    -- Local Authority District code (lad25cd)
+    lad_name        TEXT,                    -- Human-readable LAD name. NOT populated
+                                              -- by this script's loader (02_load_onspd.py
+                                              -- only gets the code from ONSPD) -- filled
+                                              -- in separately by
+                                              -- scripts/04_backfill_lad_names.py via a
+                                              -- non-destructive UPDATE (see that script's
+                                              -- docstring for why TRUNCATE is avoided here).
     region_code     TEXT,                    -- ONS region code (rgn25cd)
     region_name     TEXT,                    -- Human-readable, derived from region_code
     country         TEXT,                    -- 'England' or 'Wales'
