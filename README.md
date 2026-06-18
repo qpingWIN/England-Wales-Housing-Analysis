@@ -48,11 +48,12 @@ Contains HM Land Registry data © Crown copyright and database right 2026. Licen
 ## Known limitations (stated up front, deliberately)
 
 - **Nominal prices.** Raw prices are not inflation-adjusted, over 30 years that overstates "growth" badly. The headline trend is also produced in real (CPIH-deflated) terms.
-- **Mix/composition effect.** A median of *transacted* prices reflects what sold, not pure price change — which is why the official UK HPI uses hedonic/repeat-sales methods. The repeat-sales query (#15) is a partial mitigation, not a replication.
+- **Mix/composition effect.** A median of transacted prices reflects what sold, not pure price change, which is why the official UK HPI uses hedonic/repeat-sales methods. The repeat-sales query (#15) is a partial mitigation, not a replication.
 - **Category A only.** Analysis filters to standard sales (Category A, ~29.5M rows). Category B (repossessions, portfolio/company transfers, ~1.8M rows) is excluded and noted.
 - **Coverage.** Excludes gifts, transfers not for value, some right-to-buy, and commercial property. This is "standard residential sales registered with HMLR," not "all property".
 - **Missing postcodes.** 14,203 rows (0.05%) can't be geocoded: kept in national aggregates, excluded from maps.
-- **New-build registration lag.** HMLR registers a sale once it's lodged, an ordinary resale clears in 2 weeks–2 months, but a new-build sale needs a *first registration* of a brand-new title, which HMLR's currently published processing times put at up to 12 months. That shows up directly in query #3: new-build share of sales falls from 9.3% (2024) to 4.3% (2025) to 0.1% (2026), which is far too sharp to be a real housebuilding slowdown, and not just a partial-year artifact, since 2025 is a complete calendar year. Treat new-build figures from ~2024 onward as increasingly provisional.
+- **New-build registration lag.** HMLR registers a sale once it's lodged, an ordinary resale clears in 2 weeks–2 months, but a new-build sale needs a first registration of a brand-new title, which HMLR's currently published processing times put at up to 12 months. That shows up directly in query #3: new-build share of sales falls from 9.3% (2024) to 4.3% (2025) to 0.1% (2026), which is far too sharp to be a real housebuilding slowdown, and not just a partial-year artifact, since 2025 is a complete calendar year. Treat new-build figures from ~2024 onward as increasingly provisional.
+- **Stamp duty deadline distortions.** Governments announce stamp duty threshold changes ahead of time, so buyers rush to complete just before the deadline, then volumes dip right after. E.g. March 2016 (second-home surcharge) and March 2025 (nil-rate threshold cut) both show up as sharp single-month spikes in query #8's seasonality data. I will treat isolated month-to-month spikes/dips as policy-driven, not organic demand shifts.
 
 ## Repository structure
 
