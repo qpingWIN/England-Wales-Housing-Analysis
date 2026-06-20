@@ -8,6 +8,7 @@ DROP TABLE IF EXISTS fact_sales        CASCADE;
 DROP TABLE IF EXISTS dim_geography     CASCADE;
 DROP TABLE IF EXISTS dim_property_type CASCADE;
 DROP TABLE IF EXISTS dim_date          CASCADE;
+DROP TABLE IF EXISTS dim_cpih          CASCADE;
 
 
 -- ============================================================
@@ -96,3 +97,19 @@ CREATE INDEX idx_fact_geo  ON fact_sales(geo_key);
 CREATE INDEX idx_fact_type ON fact_sales(type_code);
 -- Partial index to make year-level filters fast without a full scan
 CREATE INDEX idx_fact_year ON fact_sales((date_key / 10000));
+
+
+-- ============================================================
+-- Dimension: CPIH
+-- Annual CPIH (Consumer Prices Index incl. owner occupiers' housing
+-- costs) index, 2015=100, used to deflate nominal prices to real
+-- terms in query #16. Joined by year, not by FK - small static
+-- reference table, populated by scripts/05_load_cpih.py.
+-- NOTE: that script also issues its own CREATE TABLE IF NOT EXISTS,
+-- so it can add this table to an already-populated live database
+-- without needing to re-run this DROP-everything script.
+-- ============================================================
+CREATE TABLE dim_cpih (
+    year        SMALLINT      PRIMARY KEY,
+    cpih_index  NUMERIC(6, 1) NOT NULL   -- 2015 = 100.0
+);
