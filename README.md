@@ -35,9 +35,9 @@ The database does the heavy lifting, Tableau and Excel only ever see aggregates,
 
 | Source | Role | In repo? |
 |---|---|---|
-| [HM Land Registry Price Paid Data](https://www.gov.uk/government/statistical-data-sets/price-paid-data-downloads) (`pp-complete.csv`, ~6 GB) | Every standard residential sale in E&W since 1995 | No — download separately |
-| [ONS Postcode Directory (ONSPD)](https://geoportal.statistics.gov.uk/) | Postcode → local authority, region, lat/long | No — download separately |
-| [ONS Local Authority Districts (April 2025) Names and Codes in the UK (V2)](https://geoportal.statistics.gov.uk/datasets/ons::local-authority-districts-april-2025-names-and-codes-in-the-uk-v2/about) (`LAD25_names_and_codes.csv`) | LAD code → human-readable name lookup (`dim_geography.lad_name`, backfilled by `scripts/04_backfill_lad_names.py`) | No — download separately |
+| [HM Land Registry Price Paid Data](https://www.gov.uk/government/statistical-data-sets/price-paid-data-downloads) (`pp-complete.csv`, ~6 GB) | Every standard residential sale in E&W since 1995 | No - download separately |
+| [ONS Postcode Directory (ONSPD)](https://geoportal.statistics.gov.uk/) | Postcode → local authority, region, lat/long | No - download separately |
+| [ONS Local Authority Districts (April 2025) Names and Codes in the UK (V2)](https://geoportal.statistics.gov.uk/datasets/ons::local-authority-districts-april-2025-names-and-codes-in-the-uk-v2/about) (`LAD25_names_and_codes.csv`) | LAD code → human-readable name lookup (`dim_geography.lad_name`, backfilled by `scripts/04_backfill_lad_names.py`) | No - download separately |
 | ONS ASHE median earnings by local authority | Affordability model (price-to-income) | No |
 | ONS CPIH index | Deflating nominal prices to real terms | No |
 
@@ -74,13 +74,13 @@ Contains HM Land Registry data © Crown copyright and database right 2026. Licen
 |---|---|---|
 | 0 | Profile data, decide filters (Cat A, price ≥ £10k, exclude partial 2026) | ✅ Done — see `notebooks/` |
 | 1 | Clean + COPY-load into Postgres star schema, ONSPD geography merge | ✅ Done |
-| 2 | 16 analytical SQL queries | 🔜 In progress |
-| 3 | Tableau Public dashboard | Planned |
-| 4 | Excel affordability model | Planned |
+| 2 | 16 analytical SQL queries | ✅ Done — see `sql/` |
+| 3 | Tableau Public dashboard | ✅ Done — [live dashboard](https://public.tableau.com/app/profile/pavlo.petrashko/viz/EnglandWalesHousingMarketAnalysis1995-2025/Overview) |
+| 4 | Excel affordability model | 🔜 In progress |
 | 5 | Findings, screenshots, polish | Planned |
 
-Key findings and the live dashboard link will be added here as phases complete.
+**Live dashboard:** [England & Wales Housing Market Analysis (1995-2025) on Tableau Public](https://public.tableau.com/app/profile/pavlo.petrashko/viz/EnglandWalesHousingMarketAnalysis1995-2025/Overview) - Overview (national trend, price by property type, transaction volume) and District Map (2015-2025 CAGR by local authority) tabs.
 
 ---
 
-*Pavlo Petrashko — [pavlo.petrashko@gmail.com](mailto:pavlo.petrashko@gmail.com)*
+*Pavlo Petrashko - [pavlo.petrashko@gmail.com](mailto:pavlo.petrashko@gmail.com)*
