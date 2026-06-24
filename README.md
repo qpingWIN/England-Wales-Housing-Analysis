@@ -72,10 +72,10 @@ Contains HM Land Registry data © Crown copyright and database right 2026. Licen
 
 | Phase | Work | Status |
 |---|---|---|
-| 0 | Profile data, decide filters (Cat A, price ≥ £10k, exclude partial 2026) | ✅ Done — see `notebooks/` |
+| 0 | Profile data, decide filters (Cat A, price ≥ £10k, exclude partial 2026) | ✅ Done - see `notebooks/` |
 | 1 | Clean + COPY-load into Postgres star schema, ONSPD geography merge | ✅ Done |
-| 2 | 16 analytical SQL queries | ✅ Done — see `sql/` |
-| 3 | Tableau Public dashboard | ✅ Done — [live dashboard](https://public.tableau.com/app/profile/pavlo.petrashko/viz/EnglandWalesHousingMarketAnalysis1995-2025/Overview) |
+| 2 | 16 analytical SQL queries | ✅ Done - see `sql/` |
+| 3 | Tableau Public dashboard | ✅ Done - [live dashboard](https://public.tableau.com/app/profile/pavlo.petrashko/viz/EnglandWalesHousingMarketAnalysis1995-2025/Overview) |
 | 4 | Excel affordability model | 🔜 In progress |
 | 5 | Findings, screenshots, polish | Planned |
 
