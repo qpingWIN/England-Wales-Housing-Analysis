@@ -8,6 +8,10 @@ PROJECT_SPEC.md
 .DS_Store
 Thumbs.db
 
+# Excel lock files
+~$*.xlsx
+~$*.xlsm
+
 # Python
 __pycache__/
 *.py[cod]
