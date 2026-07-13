@@ -76,7 +76,7 @@ Contains HM Land Registry data © Crown copyright and database right 2026. Licen
 | 1 | Clean + COPY-load into Postgres star schema, ONSPD geography merge | ✅ Done |
 | 2 | 16 analytical SQL queries | ✅ Done - see `sql/` |
 | 3 | Tableau Public dashboard | ✅ Done - [live dashboard](https://public.tableau.com/app/profile/pavlo.petrashko/viz/EnglandWalesHousingMarketAnalysis1995-2025/Overview) |
-| 4 | Excel affordability model | 🔜 In progress |
+| 4 | Excel affordability model | ✅ Done - see `excel/` |
 | 5 | Findings, screenshots, polish | Planned |
 
 **Live dashboard:** [England & Wales Housing Market Analysis (1995-2025) on Tableau Public](https://public.tableau.com/app/profile/pavlo.petrashko/viz/EnglandWalesHousingMarketAnalysis1995-2025/Overview) - Overview (national trend, price by property type, transaction volume) and District Map (2015-2025 CAGR by local authority) tabs.
