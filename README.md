@@ -53,7 +53,7 @@ Contains HM Land Registry data © Crown copyright and database right 2026. Licen
 - **Coverage** Excludes gifts, transfers not for value, some right-to-buy, and commercial property. This is "standard residential sales registered with HMLR," not "all property".
 - **Missing postcodes** 14,203 rows (0.05%) can't be geocoded: kept in national aggregates, excluded from maps.
 - **New-build registration lag** HMLR registers a sale once it's lodged, an ordinary resale clears in 2 weeks–2 months, but a new-build sale needs a first registration of a brand-new title, which HMLR's currently published processing times put at up to 12 months. That shows up directly in query #3: new-build share of sales falls from 9.3% (2024) to 4.3% (2025) to 0.1% (2026), which is far too sharp to be a real housebuilding slowdown, and not just a partial-year artifact, since 2025 is a complete calendar year. Treat new-build figures from ~2024 onward as increasingly provisional.
-- **District coverage: 317 of 318, and 316 for affordability** England & Wales has 318 local authority districts. The district-level price analysis covers 317 — the Isles of Scilly is excluded for insufficient transaction volume. The affordability model covers 316: the City of London additionally lacks ASHE earnings data (its resident population is too small to survey reliably).
+- **District coverage: 317 of 318, and 316 for affordability** England & Wales has 318 local authority districts. The district-level price analysis covers 317 - the Isles of Scilly is excluded for insufficient transaction volume. The affordability model covers 316: the City of London additionally lacks ASHE earnings data (its resident population is too small to survey reliably).
 - **Individual, not household, incomes** The affordability model compares prices to *individual* full-time median pay (ASHE), consistent with how the ONS publishes its own affordability ratios - but homes are often bought on two incomes. As a sensitivity check: at 1.5 median incomes per household the median earner is priced out of 233 of 316 districts, and even at two full median incomes, 125 of 316 (40%) remain unaffordable under the 4.5× cap with a 10% deposit.
 - **Stamp duty deadline distortions** Governments announce stamp duty threshold changes ahead of time, so buyers rush to complete just before the deadline, then volumes dip right after. E.g. March 2016 (second-home surcharge) and March 2025 (nil-rate threshold cut) both show up as sharp single-month spikes in query #8's seasonality data. Isolated month-to-month spikes/dips are treated as policy-driven, not organic demand shifts.
 
@@ -82,7 +82,7 @@ All figures are reproducible from the aggregates in `tableau/` and the `Merged` 
 ```
 ├── notebooks/             # Data profiling (row counts, quality checks, filter decisions)
 ├── scripts/               # Python ETL (Phase 1)
-├── sql/                   # Schema DDL + 16 analytical queries (Phase 2)
+├── sql/                   # Schema DDL + 16 analytical queries (Phase 2) + regression sample extract (Phase 6)
 ├── tableau/               # Dashboard workbook + aggregate extracts (Phase 3)
 ├── excel/                 # Affordability model (Phase 4)
 └── data/
