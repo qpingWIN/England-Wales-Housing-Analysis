@@ -1,5 +1,6 @@
 # Ignore data files
 data/raw/
+data/processed/*.csv
 
 # Private working notes
 PROJECT_SPEC.md
@@ -20,3 +21,7 @@ venv/
 
 # Jupyter checkpoints
 .ipynb_checkpoints/
+
+# Temporary - remove when Phase 6 ships
+notebooks/hedonic_index.ipynb
+sql/17_hedonic_sample_extract.sql

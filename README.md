@@ -10,7 +10,7 @@ The intended reader is non-technical, i.e. someone deciding where to look, what 
 
 ## Stack & architecture
 
-Python (profiling + ETL) -> PostgreSQL (star schema warehouse) -> SQL (16 analytical queries) -> Tableau Public (interactive dashboard) -> Excel (affordability model with Power Query, pivots, PMT).
+Python (profiling + ETL) -> PostgreSQL (star schema warehouse) -> SQL (16 analytical queries) -> Tableau Public (interactive dashboard) -> Excel (affordability model with Power Query, pivots, PMT) -> Python again (statsmodels hedonic-lite regression - Phase 6, in progress).
 
 ```
 pp-complete.csv ─┐
@@ -36,8 +36,8 @@ The database does the heavy lifting, Tableau and Excel only ever see aggregates,
 | Source | Role | In repo? |
 |---|---|---|
 | [HM Land Registry Price Paid Data](https://www.gov.uk/government/statistical-data-sets/price-paid-data-downloads) (`pp-complete.csv`, ~6 GB) | Every standard residential sale in E&W since 1995 | No - download separately |
-| [ONS Postcode Directory (ONSPD)](https://geoportal.statistics.gov.uk/) | Postcode → local authority, region, lat/long | No - download separately |
-| [ONS Local Authority Districts (April 2025) Names and Codes in the UK (V2)](https://geoportal.statistics.gov.uk/datasets/ons::local-authority-districts-april-2025-names-and-codes-in-the-uk-v2/about) (`LAD25_names_and_codes.csv`) | LAD code → human-readable name lookup (`dim_geography.lad_name`, backfilled by `scripts/04_backfill_lad_names.py`) | No - download separately |
+| [ONS Postcode Directory (ONSPD)](https://geoportal.statistics.gov.uk/) | Postcode -> local authority, region, lat/long | No - download separately |
+| [ONS Local Authority Districts (April 2025) Names and Codes in the UK (V2)](https://geoportal.statistics.gov.uk/datasets/ons::local-authority-districts-april-2025-names-and-codes-in-the-uk-v2/about) (`LAD25_names_and_codes.csv`) | LAD code -> human-readable name lookup (`dim_geography.lad_name`, backfilled by `scripts/04_backfill_lad_names.py`) | No - download separately |
 | ONS ASHE median earnings by local authority | Affordability model (price-to-income) | No |
 | ONS CPIH index | Deflating nominal prices to real terms | No |
 
@@ -48,14 +48,14 @@ Contains HM Land Registry data © Crown copyright and database right 2026. Licen
 ## Known limitations (stated up front, deliberately)
 
 - **Nominal prices** Raw prices are not inflation-adjusted, over 30 years that overstates "growth" badly. The headline trend is also produced in real (CPIH-deflated) terms.
-- **Mix/composition effect** A median of transacted prices reflects what sold, not pure price change: if the sales mix shifts toward flats, the median falls with no home losing value. The official UK HPI controls for this with hedonic regression - modelling price as a function of property characteristics and tracking a quality-adjusted "standard" home. I used medians anyway, for two reasons: PPD(Priced Paid Data) carries too few attributes (no floor area or room counts) to fit a full hedonic model without joining external data, and medians are transparent to the non-technical reader this project targets. The repeat-sales query (#15) is a partial mitigation, not a replication. Mix distortion is worst exactly where flagged: new-build waves, stamp-duty deadlines and the post-2020 "race for space".
+- **Mix/composition effect** A median of transacted prices reflects what sold, not pure price change: if the sales mix shifts toward flats, the median falls with no home losing value. The official UK HPI controls for this with hedonic regression - modelling price as a function of property characteristics and tracking a quality-adjusted "standard" home. I used medians anyway, for two reasons: PPD (Price Paid Data) carries too few attributes (no floor area or room counts) to fit a full hedonic model without joining external data, and medians are transparent to the non-technical reader this project targets. The repeat-sales query (#15) is a partial mitigation, not a replication. Mix distortion is worst exactly where flagged: new-build waves, stamp-duty deadlines and the post-2020 "race for space".
 - **Category A only** Analysis filters to standard sales (Category A, ~29.5M rows). Category B (repossessions, portfolio/company transfers, ~1.8M rows) is excluded and noted.
 - **Coverage** Excludes gifts, transfers not for value, some right-to-buy, and commercial property. This is "standard residential sales registered with HMLR," not "all property".
 - **Missing postcodes** 14,203 rows (0.05%) can't be geocoded: kept in national aggregates, excluded from maps.
 - **New-build registration lag** HMLR registers a sale once it's lodged, an ordinary resale clears in 2 weeks–2 months, but a new-build sale needs a first registration of a brand-new title, which HMLR's currently published processing times put at up to 12 months. That shows up directly in query #3: new-build share of sales falls from 9.3% (2024) to 4.3% (2025) to 0.1% (2026), which is far too sharp to be a real housebuilding slowdown, and not just a partial-year artifact, since 2025 is a complete calendar year. Treat new-build figures from ~2024 onward as increasingly provisional.
 - **District coverage: 317 of 318, and 316 for affordability** England & Wales has 318 local authority districts. The district-level price analysis covers 317 — the Isles of Scilly is excluded for insufficient transaction volume. The affordability model covers 316: the City of London additionally lacks ASHE earnings data (its resident population is too small to survey reliably).
 - **Individual, not household, incomes** The affordability model compares prices to *individual* full-time median pay (ASHE), consistent with how the ONS publishes its own affordability ratios - but homes are often bought on two incomes. As a sensitivity check: at 1.5 median incomes per household the median earner is priced out of 233 of 316 districts, and even at two full median incomes, 125 of 316 (40%) remain unaffordable under the 4.5× cap with a 10% deposit.
-- **Stamp duty deadline distortions** Governments announce stamp duty threshold changes ahead of time, so buyers rush to complete just before the deadline, then volumes dip right after. E.g. March 2016 (second-home surcharge) and March 2025 (nil-rate threshold cut) both show up as sharp single-month spikes in query #8's seasonality data. I will treat isolated month-to-month spikes/dips as policy-driven, not organic demand shifts.
+- **Stamp duty deadline distortions** Governments announce stamp duty threshold changes ahead of time, so buyers rush to complete just before the deadline, then volumes dip right after. E.g. March 2016 (second-home surcharge) and March 2025 (nil-rate threshold cut) both show up as sharp single-month spikes in query #8's seasonality data. Isolated month-to-month spikes/dips are treated as policy-driven, not organic demand shifts.
 
 ## Key findings (1995–2025)
 
@@ -66,7 +66,7 @@ Contains HM Land Registry data © Crown copyright and database right 2026. Licen
    ![Excel pivot chart: median detached house price by region, 1995-2025, with slicer and event annotations](assets/excel_pivot.png)
    *The workbook's pivot tab: regional divergence for detached homes, with a property-type slicer and annotated market events.*
 
-3. **The last decade reversed the winners** The five fastest-appreciating districts of 2015–2025 are Salford (6.3% CAGR), Blaenau Gwent (6.1%), Leicester, Oldham, Sandwell, they are all in the North, Midlands or Wales. The five slowest are all prime London: Kensington & Chelsea, Westminster and Hammersmith & Fulham posted *negative* nominal CAGRs. Prime London has flatlined for ten years while Salford's median nearly doubled.
+3. **The last decade reversed the winners** The five fastest-appreciating districts of 2015–2025 are Salford (6.3% CAGR), Blaenau Gwent (6.1%), Leicester, Oldham and Sandwell - all in the North, Midlands or Wales. The five slowest are all prime London: Kensington & Chelsea, Westminster and Hammersmith & Fulham posted *negative* nominal CAGRs. Prime London has flatlined for ten years while Salford's median nearly doubled.
 
 4. **A median earner cannot buy the median home in 310 of 316 districts** The median district price-to-income ratio is 9.2 which is more than double the 4.5× loan-to-income cap lenders apply. Even with a 10% deposit, median pay falls short of the required income in 98% of districts. The exceptions are all in the North West, North East and the Welsh valleys (Burnley is the most affordable at 4.5). At the other extreme, Kensington & Chelsea sits at 24.6×. The Excel model in `excel/` makes this interactive: pick a district, see the gap.
 
@@ -100,6 +100,8 @@ All figures are reproducible from the aggregates in `tableau/` and the `Merged` 
 | 3 | Tableau Public dashboard | ✅ Done - [live dashboard](https://public.tableau.com/app/profile/pavlo.petrashko/viz/EnglandWalesHousingMarketAnalysis1995-2025/Overview) |
 | 4 | Excel affordability model | ✅ Done - see `excel/` |
 | 5 | Findings, screenshots, polish | ✅ Done |
+| 6 | Hedonic-lite regression: constant-quality price index (log-price OLS on type, tenure, new-build, region, year) compared against the median index, quantifying the mix effect | 🔜 In progress |
+| 7 | Full hedonic upgrade: EPC join for floor area / room counts | 💡 Planned |
 
 **Live dashboard:** [England & Wales Housing Market Analysis (1995-2025) on Tableau Public](https://public.tableau.com/app/profile/pavlo.petrashko/viz/EnglandWalesHousingMarketAnalysis1995-2025/Overview) - Overview (national trend, price by property type, transaction volume) and District Map (2015-2025 CAGR by local authority) tabs.
 
