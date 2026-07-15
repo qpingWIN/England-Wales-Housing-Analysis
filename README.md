@@ -10,7 +10,7 @@ The intended reader is non-technical, i.e. someone deciding where to look, what 
 
 ## Stack & architecture
 
-Python (profiling + ETL) -> PostgreSQL (star schema warehouse) -> SQL (16 analytical queries) -> Tableau Public (interactive dashboard) -> Excel (affordability model with Power Query, pivots, PMT) -> Python again (statsmodels hedonic-lite regression - Phase 6, in progress).
+Python (profiling + ETL) -> PostgreSQL (star schema warehouse) -> SQL (16 analytical queries) -> Tableau Public (interactive dashboard) -> Excel (affordability model with Power Query, pivots, PMT) -> Python again (statsmodels hedonic-lite regression -> constant-quality price index).
 
 ```
 pp-complete.csv ─┐
@@ -48,7 +48,7 @@ Contains HM Land Registry data © Crown copyright and database right 2026. Licen
 ## Known limitations (stated up front, deliberately)
 
 - **Nominal prices** Raw prices are not inflation-adjusted, over 30 years that overstates "growth" badly. The headline trend is also produced in real (CPIH-deflated) terms.
-- **Mix/composition effect** A median of transacted prices reflects what sold, not pure price change: if the sales mix shifts toward flats, the median falls with no home losing value. The official UK HPI controls for this with hedonic regression - modelling price as a function of property characteristics and tracking a quality-adjusted "standard" home. I used medians anyway, for two reasons: PPD (Price Paid Data) carries too few attributes (no floor area or room counts) to fit a full hedonic model without joining external data, and medians are transparent to the non-technical reader this project targets. The repeat-sales query (#15) is a partial mitigation, not a replication. Mix distortion is worst exactly where flagged: new-build waves, stamp-duty deadlines and the post-2020 "race for space".
+- **Mix/composition effect** A median of transacted prices reflects what sold, not pure price change: if the sales mix shifts toward flats, the median falls with no home losing value. The official UK HPI controls for this with hedonic regression - modelling price as a function of property characteristics and tracking a quality-adjusted "standard" home. I used medians anyway, for two reasons: PPD (Price Paid Data) carries too few attributes (no floor area or room counts) to fit a full hedonic model without joining external data, and medians are transparent to the non-technical reader this project targets. The repeat-sales query (#15) is a partial mitigation, not a replication. Mix distortion is worst exactly where flagged: new-build waves, stamp-duty deadlines and the post-2020 "race for space". Phase 6 tests this limitation directly - the hedonic-lite index (finding #6) shows the median *understates* constant-quality growth, by ~3.6% as of 2025.
 - **Category A only** Analysis filters to standard sales (Category A, ~29.5M rows). Category B (repossessions, portfolio/company transfers, ~1.8M rows) is excluded and noted.
 - **Coverage** Excludes gifts, transfers not for value, some right-to-buy, and commercial property. This is "standard residential sales registered with HMLR," not "all property".
 - **Missing postcodes** 14,203 rows (0.05%) can't be geocoded: kept in national aggregates, excluded from maps.
@@ -75,12 +75,17 @@ Contains HM Land Registry data © Crown copyright and database right 2026. Licen
 
 5. **The cheap end grew fastest** Terraced homes appreciated 5.6× against 4.9× for detached. The price growth was strongest precisely in the segment where first-time buyers compete.
 
+6. **Quality-adjusted, prices rose slightly more than the median suggests** A hedonic-lite regression (log-price OLS on a seeded 1.17M-sale sample. Type, tenure, new-build, region and year dummies, R² 0.68 - see `notebooks/hedonic_index.ipynb`) puts constant-quality growth at **5.52×** against the median's 5.36×: the sales mix has been masking growth, not inflating it. The gap is episodic - largest at the 2007 peak (−31 index points, the flat-building boom cheapening the mix) and reopening to −16 by 2025 (the new-build registration lag removing premium stock). Robust to half-sampling within 2.6 points. Side products: the detached premium (+104% vs terraced), London premium (+67% vs South East), leasehold discount (−11.7%) and new-build premium (+20.3%), all controlled for each other.
+
+   ![Constant-quality (hedonic-lite) index vs median index, England & Wales, 1995=100](assets/hedonic_vs_median_index.png)
+   *What sold vs what things cost: the shaded gap is the mix effect - visible at the 2007 boom and after 2021, near zero in calm decades.*
+
 All figures are reproducible from the aggregates in `tableau/` and the `Merged` tab of the Excel workbook, the underlying queries are in `sql/`.
 
 ## Repository structure
 
 ```
-├── notebooks/             # Data profiling (row counts, quality checks, filter decisions)
+├── notebooks/             # Data profiling (Phase 0) + hedonic index regression (Phase 6)
 ├── scripts/               # Python ETL (Phase 1)
 ├── sql/                   # Schema DDL + 16 analytical queries (Phase 2) + regression sample extract (Phase 6)
 ├── tableau/               # Dashboard workbook + aggregate extracts (Phase 3)
@@ -100,7 +105,7 @@ All figures are reproducible from the aggregates in `tableau/` and the `Merged` 
 | 3 | Tableau Public dashboard | ✅ Done - [live dashboard](https://public.tableau.com/app/profile/pavlo.petrashko/viz/EnglandWalesHousingMarketAnalysis1995-2025/Overview) |
 | 4 | Excel affordability model | ✅ Done - see `excel/` |
 | 5 | Findings, screenshots, polish | ✅ Done |
-| 6 | Hedonic-lite regression: constant-quality price index (log-price OLS on type, tenure, new-build, region, year) compared against the median index, quantifying the mix effect | 🔜 In progress |
+| 6 | Hedonic-lite regression: constant-quality price index (log-price OLS on type, tenure, new-build, region, year) compared against the median index, quantifying the mix effect | ✅ Done - see `notebooks/hedonic_index.ipynb` |
 | 7 | Full hedonic upgrade: EPC join for floor area / room counts | 💡 Planned |
 
 **Live dashboard:** [England & Wales Housing Market Analysis (1995-2025) on Tableau Public](https://public.tableau.com/app/profile/pavlo.petrashko/viz/EnglandWalesHousingMarketAnalysis1995-2025/Overview) - Overview (national trend, price by property type, transaction volume) and District Map (2015-2025 CAGR by local authority) tabs.

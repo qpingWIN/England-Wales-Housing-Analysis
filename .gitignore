@@ -21,6 +21,3 @@ venv/
 
 # Jupyter checkpoints
 .ipynb_checkpoints/
-
-# Temporary - remove when Phase 6 ships
-notebooks/hedonic_index.ipynb
