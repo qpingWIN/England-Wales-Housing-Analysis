@@ -1,4 +1,4 @@
-# England & Wales Housing Market Analysis (1995–present)
+# England & Wales Housing Market Analysis (1995-present)
 
 > **Scope note:** this project covers **England and Wales only**, not the whole UK. HM Land Registry Price Paid Data excludes Scotland (Registers of Scotland) and Northern Ireland (Land & Property Services). Verified empirically: the dataset contains no Scottish (EH/G) or Northern Irish (BT) postcodes.
 
